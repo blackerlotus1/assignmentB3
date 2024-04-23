@@ -1,0 +1,142 @@
+%%Assignment B3
+clear all
+
+
+
+%%%%%%%%%%% You can change the dimension of C and the value of x and A here%%%%%%%%%% 
+
+n=5;
+x_0=[1;1;2];
+A=[1 0 0;1 1 0; 0 2 1];
+
+%%%%%%%%%%% You can change the dimension of C and the value of x and A here%%%%%%%%%% 
+
+
+
+wt=randn(3,100);
+vt1=randn(1,100);
+vt2=randn(2,100);
+vtn=randn(n,100);
+Q=eye(3);
+
+R1=1;
+R2=eye(2);
+Rn=eye(n);
+
+C1=[1 0 0];
+C2=[1 0 0;1 0 0];
+Cn=repmat([1 0 0],n,1);
+x_t=zeros(3,1);
+
+
+sigma=eye(3);
+
+x_t=x_0;
+for i=1:100
+    x_measurement=A*x_t;
+    sigma_=(A*sigma*A')+Q;
+    K=sigma_*C1'/(C1*sigma_*C1'+R1); 
+    yt=C1*x_t+vt1(:,i);
+    x_t=x_measurement+K*(yt-C1*x_measurement);
+    sigma=sigma_-K*C1*sigma_;
+    x_true=A*x_t+wt(i);
+    x_record_1(:,i)=x_t; %%%%%% time update
+    x_record_2(:,i)=x_measurement; %%%%%% measurement update
+    x_record_true_1(:,i)=x_true;
+    error1(i)=(x_record_true_1(1,i)-x_record_2(1,i))^2; %%%%%true value vs measurement update
+    error1_2(i)=(x_record_1(1,i)-x_record_2(1,i))^2;  %%%%%time update vs measurement update
+end
+figure(1)
+subplot(3,1,1)
+plot(x_record_1(1,:),'r');
+hold on
+plot(x_record_2(1,:),'b');
+plot(x_record_true_1(1,:),'g');
+legend('x time','x measurement','x true')
+title('True value vs measured value')
+subplot(3,1,2)
+plot(x_record_true_1(1,:)-x_record_2(1,:))
+mse1=sum(error1(:))/100;
+title('Error between true value and measured value')
+text(3, 0.5, ['MSE = ', num2str(mse1)]);
+subplot(3,1,3)
+plot(x_record_1(1,:)-x_record_2(1,:))
+mse1_2=sum(error1_2(:))/100;
+text(3, 0.5, ['MSE = ', num2str(mse1_2)]);
+title('Error between time update and measurement update')
+suptitle('Single sensor')
+
+
+x_t=x_0;
+for i=1:100
+    x_measurement=A*x_t
+    sigma_=(A*sigma*A')+Q;
+    K=sigma_*C2'/(C2*sigma_*C2'+R2); 
+    yt=C2*x_t+vt2(:,i);
+    x_t=x_measurement+K*(yt-C2*x_measurement)
+    sigma=sigma_-K*C2*sigma_;
+    x_true=A*x_t+wt(i);
+    x_record_3(:,i)=x_t;
+    x_record_4(:,i)=x_measurement;
+    x_record_true_2(:,i)=x_true;
+    error2(i)=(x_record_true_2(1,i)-x_record_4(1,i))^2;
+    error2_2(i)=(x_record_3(1,i)-x_record_4(1,i))^2
+end
+figure(2)
+subplot(3,1,1)
+plot(x_record_3(1,:),'r');
+hold on
+plot(x_record_4(1,:),'b');
+plot(x_record_true_2(1,:),'g');
+legend('x true','x measurement')
+title('True value vs measured value')
+subplot(3,1,2)
+plot(x_record_true_2(1,:)-x_record_4(1,:))
+mse2=sum(error2(:))/100;
+title('Error between true value and measured value')
+text(3, 0.5, ['MSE = ', num2str(mse2)]);
+
+subplot(3,1,3)
+plot(x_record_3(1,:)-x_record_4(1,:))
+mse2_2=sum(error2_2(:))/100;
+text(3, 0.5, ['MSE = ', num2str(mse2_2)]);
+title('Error between time update and measurement update')
+suptitle('Two sensor of the same type')
+
+
+
+x_t=x_0;
+for i=1:100
+    x_measurement=A*x_t;
+    sigma_=(A*sigma*A')+Q;
+    K=sigma_*Cn'/(Cn*sigma_*Cn'+Rn); 
+    yt=Cn*x_t+vtn(:,i);
+    x_t=x_measurement+K*(yt-Cn*x_measurement);
+    sigma=sigma_-K*Cn*sigma_;
+    x_true=A*x_t+wt(i);
+    x_record_5(:,i)=x_t;
+    x_record_6(:,i)=x_measurement;
+    x_record_true_3(:,i)=x_true;
+    error3(i)=(x_record_true_3(1,i)-x_record_6(1,i))^2;
+    error3_2(i)=(x_record_5(1,i)-x_record_6(1,i))^2;
+end
+figure(3)
+subplot(3,1,1)
+plot(x_record_5(1,:),'r');
+hold on
+plot(x_record_6(1,:),'b');
+plot(x_record_true_3(1,:),'g');
+legend('x true','x measurement')
+title('True value vs measured value')
+subplot(3,1,2)
+plot(x_record_true_3(1,:)-x_record_6(1,:))
+mse3=sum(error3(:))/100;
+title('Error between true value and measured value')
+text(3, 0.5, ['MSE = ', num2str(mse3)]);
+
+subplot(3,1,3)
+plot(x_record_5(1,:)-x_record_6(1,:))
+mse3_2=sum(error3_2(:))/100;
+text(3, 0.5, ['MSE = ', num2str(mse3_2)]);
+title('Error between time update and measurement update')
+suptitle('N sensor of the same type')
